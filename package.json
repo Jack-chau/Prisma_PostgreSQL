@@ -1,0 +1,22 @@
+{
+  "name": "prisma_postgresql",
+  "version": "1.0.0",
+  "description": "Prisma is an open-source database toolkit that provides a type-safe ORM (Object Relational Mapping) layer for your database. It supports multiple databases, including PostgreSQL, MySQL, SQLite, and MongoDB.",
+  "main": "index.js",
+  "scripts": {
+    "devStart": "nodemon script.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.16.0",
+    "nodemon": "^2.0.22",
+    "prisma": "^4.13.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.13.0"
+  }
+}
