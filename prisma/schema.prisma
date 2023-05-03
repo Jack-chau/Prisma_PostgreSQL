@@ -13,8 +13,57 @@ datasource db {
   url      = env("DATABASE_URL") // Defined from .env file
 }
 
-model User {
-  id Int @id @default( autoincrement( ) ) 
-  name String
+// Model essentially represent the different tables inside your database, where you can store your data.
+// And each model is essentially composed of a bunch of different fields( columns ).
+
+enum Role {
+  BASIC
+  EDITOR
+  ADMIN
 }
 
+// One to Many Relationship
+model User {
+  // @ is a field attribute
+  id             String          @id @default(uuid())
+  age            Int
+  name           String
+  email          String          @unique
+  role           Role            @default(BASIC) //You can specify the choice by using enum model, default is BASIC
+  writtenPosts   Post[]          @relation("WrittenPosts") // A User may have many post, the posts he currently doing or their favourite post
+  favouritePosts Post[]          @relation("FavouritePosts")
+  userPreference UserPreference?
+
+  // @@ is a block level attribute
+  @@unique([age, name]) // In User table, age and name must be unique, no user have same name and same age
+  @@index([email]) // It's gonna to help with things like sorting and performance.
+}
+
+model UserPreference {
+  id          String  @id @default(uuid())
+  emailUpdate Boolean // Do you want to receive email notice?
+  user        User    @relation(fields: [userId], references: [id])
+  userId      String  @unique
+}
+
+model Post {
+  id            String     @id @default(uuid())
+  title         String
+  averageRating Float
+  ceratedAt     DateTime   @default(now()) // default to the timeline when we create this
+  updateAt      DateTime   @updatedAt // @updatedAt will automatically generate a new time when we click update
+  author        User       @relation("WrittenPosts", fields: [authorId], references: [id]) // Which field from our "Post( PK )" table is relate to "User Table( FK )"
+  authorId      String
+  favouriteBy   User?      @relation("FavouritePosts", fields: [favouriteById], references: [id])
+  favouriteById String?
+  categories    Category[]
+
+  //  @@id( [ title, authorId ] ) //Composite key, use title and authouId to be an unique Id
+}
+
+// Many to Many Relationship
+model Category {
+  id    String @id @default(uuid())
+  name  String @unique
+  posts Post[]
+}
