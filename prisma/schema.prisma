@@ -23,7 +23,10 @@ enum Role {
 }
 
 // One to Many Relationship
-model User {
+model User {               
+
+
+
   // @ is a field attribute
   id             String          @id @default(uuid())
   age            Int
@@ -32,18 +35,23 @@ model User {
   role           Role            @default(BASIC) //You can specify the choice by using enum model, default is BASIC
   writtenPosts   Post[]          @relation("WrittenPosts") // A User may have many post, the posts he currently doing or their favourite post
   favouritePosts Post[]          @relation("FavouritePosts")
-  userPreference UserPreference?
+//  userPreference UserPreference?       
+//  Since we link the above column with another table, it cannot delete userPreference even we run { await prisma.user.deleteMany( ) }. 
+//  Therefore, we have to change the linking like below:
+  userPreference UserPreference? @relation( fields : [ userPreferenceId ], references : [ id ] ) 
+// By doing this, when we delete the User, it will automatically delete userPreference
+  userPreferenceId String? @unique
 
   // @@ is a block level attribute
   @@unique([age, name]) // In User table, age and name must be unique, no user have same name and same age
   @@index([email]) // It's gonna to help with things like sorting and performance.
 }
 
+// A single table relay to User
 model UserPreference {
   id          String  @id @default(uuid())
   emailUpdate Boolean // Do you want to receive email notice?
-  user        User    @relation(fields: [userId], references: [id])
-  userId      String  @unique
+  user User?
 }
 
 model Post {
